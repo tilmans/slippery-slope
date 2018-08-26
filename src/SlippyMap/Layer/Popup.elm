@@ -13,7 +13,7 @@ module SlippyMap.Layer.Popup
 -}
 
 import Html exposing (Html)
-import Html.Attributes
+import Html.Attributes exposing (style, class)
 import Html.Events
 import SlippyMap.Geo.Location exposing (Location)
 import SlippyMap.Layer as Layer exposing (Layer)
@@ -43,45 +43,37 @@ config =
 
 {-| -}
 withCloseMsg : msg -> Config popup msg -> Config popup msg
-withCloseMsg closeMsg (Config config) =
+withCloseMsg closeMsg (Config config_) =
     Config
-        { config | closeMsg = Just closeMsg }
+        { config_ | closeMsg = Just closeMsg }
 
 
 simplePopup : String -> Html msg
 simplePopup content =
     Html.div
-        [ Html.Attributes.class "popup--simple"
-        , Html.Attributes.style
-            [ ( "filter"
-              , "drop-shadow(rgba(0,0,0,0.2) 0px 2px 4px)"
-              )
-            , ( "transform", "translate(6px, -50%)" )
-            , ( "display", "flex" )
-            , ( "align-items", "center" )
-            ]
+        [ class "popup--simple"
+        , style "filter" "drop-shadow(rgba(0,0,0,0.2) 0px 2px 4px)"
+        , style "transform" "translate(6px, -50%)"
+        , style "display" "flex"
+        , style "align-items" "center"
         ]
         [ Html.div
-            [ Html.Attributes.style
-                [ ( "position", "relative" )
-                , ( "left", "6px" )
-                , ( "background", "#fff" )
-                , ( "border-radius", "0 0 0 2px" )
-                , ( "width", "12px" )
-                , ( "height", "12px" )
-                , ( "transform", "rotate(45deg)" )
-                ]
+            [ style "position" "relative"
+            , style "left" "6px"
+            , style "background" "#fff"
+            , style "border-radius" "0 0 0 2px"
+            , style "width" "12px"
+            , style "height" "12px"
+            , style "transform" "rotate(45deg)"
             ]
             []
         , Html.div
-            [ Html.Attributes.style
-                [ ( "position", "relative" )
-                , ( "background", "#fff" )
-                , ( "border-radius", "4px" )
-                , ( "padding", "0.5em 1em" )
-                , ( "min-width", "60px" )
-                , ( "max-width", "240px" )
-                ]
+            [ style "position" "relative"
+            , style "background" "#fff"
+            , style "border-radius" "4px"
+            , style "padding" "0.5em 1em"
+            , style "min-width" "60px"
+            , style "max-width" "240px"
             ]
             [ Html.text content ]
         ]
@@ -93,41 +85,38 @@ simplePopup content =
 
 {-| -}
 layer : Config popup msg -> List ( Location, popup ) -> Layer msg
-layer config locatedPopups =
-    Layer.custom (render config locatedPopups) Layer.popup
+layer config_ locatedPopups =
+    Layer.custom (render config_ locatedPopups) Layer.popup
 
 
 render : Config popup msg -> List ( Location, popup ) -> Map msg -> Html msg
-render config locatedPopups map =
+render config_ locatedPopups map =
     Html.div [ Html.Attributes.class "layer--popup" ]
-        (List.map (renderPopup config map) locatedPopups)
+        (List.map (renderPopup config_ map) locatedPopups)
 
 
 renderPopup : Config popup msg -> Map msg -> ( Location, popup ) -> Html msg
-renderPopup (Config config) map ( location, popup ) =
+renderPopup (Config config_) map ( location, popup ) =
     let
         popupPoint =
             Map.locationToScreenPoint map location
 
         closeAttributes =
-            config.closeMsg
+            config_.closeMsg
                 |> Maybe.map (Html.Events.onClick >> List.singleton)
                 |> Maybe.withDefault []
     in
     Html.div
-        ([ Html.Attributes.class "popup__positioner"
-         , Html.Attributes.style
-            [ ( "position", "absolute" )
-            , ( "pointer-events", "auto" )
-            , ( "transform"
-              , "translate("
-                    ++ toString popupPoint.x
+        ([ class "popup__positioner"
+         , style "position" "absolute"
+         , style "pointer-events" "auto"
+         , style "transform"
+                ("translate("
+                    ++ String.fromFloat popupPoint.x
                     ++ "px, "
-                    ++ toString popupPoint.y
-                    ++ "px)"
-              )
-            ]
+                    ++ String.fromFloat popupPoint.y
+                    ++ "px)")
          ]
             ++ closeAttributes
         )
-        [ config.renderPopup popup ]
+        [ config_.renderPopup popup ]

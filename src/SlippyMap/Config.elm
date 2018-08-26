@@ -2,14 +2,14 @@ module SlippyMap.Config
     exposing
         ( Config
         , Interactions
-        , attributionPrefix
-        , crs
-        , interactions
+        , attributionPrefixFrom
+        , crsFrom
+        , interactionsFrom
         , interactive
-        , maxZoom
-        , minZoom
-        , pointerPositionDecoder
-        , size
+        , maxZoomFrom
+        , minZoomFrom
+        , pointerPositionDecoderFrom
+        , sizeFrom
         , static
         , tagger
         , withAttributionPrefix
@@ -20,9 +20,9 @@ module SlippyMap.Config
         , withZoomSnap
         , withoutAttributionControl
         , withoutZoomControl
-        , zoomControl
-        , zoomDelta
-        , zoomSnap
+        , zoomControlFrom
+        , zoomDeltaFrom
+        , zoomSnapFrom
         )
 
 {-|
@@ -31,12 +31,12 @@ module SlippyMap.Config
 
 -}
 
-import DOM
 import Json.Decode as Decode exposing (Decoder)
 import SlippyMap.Geo.CRS exposing (CRS)
 import SlippyMap.Geo.CRS.EPSG3857 as EPSG3857
 import SlippyMap.Geo.Point exposing (Point)
 import SlippyMap.Msg exposing (Msg)
+import DOM
 
 
 {-| Configuration for the map.
@@ -97,7 +97,6 @@ domPointerPositionDecoder =
             Decode.field "clientTop" Decode.float
         )
 
-
 mapPosition : Decoder DOM.Rectangle
 mapPosition =
     Decode.oneOf
@@ -126,17 +125,17 @@ interactiveInteractions =
 
 {-| -}
 static : Point -> Config msg
-static size =
+static newSize =
     Config
-        { defaultConfigInternal | size = size }
+        { defaultConfigInternal | size = newSize }
 
 
 {-| -}
 interactive : Point -> (Msg -> msg) -> Config msg
-interactive size toMsg =
+interactive newSize toMsg =
     Config
         { defaultConfigInternal
-            | size = size
+            | size = newSize
             , toMsg = Just toMsg
             , zoomControl = True
         }
@@ -144,9 +143,9 @@ interactive size toMsg =
 
 {-| -}
 withCRS : CRS -> Config msg -> Config msg
-withCRS crs (Config configInternal) =
+withCRS newCrs (Config configInternal) =
     Config
-        { configInternal | crs = crs }
+        { configInternal | crs = newCrs }
 
 
 {-| -}
@@ -172,71 +171,71 @@ withoutAttributionControl (Config configInternal) =
 
 {-| -}
 withMaxZoom : Float -> Config msg -> Config msg
-withMaxZoom maxZoom (Config configInternal) =
+withMaxZoom newMaxZoom (Config configInternal) =
     Config
-        { configInternal | maxZoom = maxZoom }
+        { configInternal | maxZoom = newMaxZoom }
 
 
 {-| -}
 withMinZoom : Float -> Config msg -> Config msg
-withMinZoom minZoom (Config configInternal) =
+withMinZoom newMinZoom (Config configInternal) =
     Config
-        { configInternal | minZoom = minZoom }
+        { configInternal | minZoom = newMinZoom }
 
 
 {-| -}
 withZoomSnap : Float -> Config msg -> Config msg
-withZoomSnap zoomSnap (Config configInternal) =
+withZoomSnap newZoomSnap (Config configInternal) =
     Config
-        { configInternal | zoomSnap = zoomSnap }
+        { configInternal | zoomSnap = newZoomSnap }
 
 
 {-| -}
 withZoomDelta : Float -> Config msg -> Config msg
-withZoomDelta zoomDelta (Config configInternal) =
+withZoomDelta newZoomDelta (Config configInternal) =
     Config
-        { configInternal | zoomDelta = zoomDelta }
+        { configInternal | zoomDelta = newZoomDelta }
 
 
 {-| -}
-size : Config msg -> Point
-size (Config { size }) =
+sizeFrom : Config msg -> Point
+sizeFrom (Config { size }) =
     size
 
 
 {-| -}
-crs : Config msg -> CRS
-crs (Config { crs }) =
+crsFrom : Config msg -> CRS
+crsFrom (Config { crs }) =
     crs
 
 
 {-| -}
-minZoom : Config msg -> Float
-minZoom (Config { minZoom }) =
+minZoomFrom : Config msg -> Float
+minZoomFrom (Config { minZoom }) =
     minZoom
 
 
 {-| -}
-maxZoom : Config msg -> Float
-maxZoom (Config { maxZoom }) =
+maxZoomFrom : Config msg -> Float
+maxZoomFrom (Config { maxZoom }) =
     maxZoom
 
 
 {-| -}
-zoomDelta : Config msg -> Float
-zoomDelta (Config { zoomDelta }) =
+zoomDeltaFrom : Config msg -> Float
+zoomDeltaFrom (Config { zoomDelta }) =
     zoomDelta
 
 
 {-| -}
-zoomSnap : Config msg -> Float
-zoomSnap (Config { zoomSnap }) =
+zoomSnapFrom : Config msg -> Float
+zoomSnapFrom (Config { zoomSnap }) =
     zoomSnap
 
 
 {-| -}
-zoomControl : Config msg -> Bool
-zoomControl (Config { zoomControl }) =
+zoomControlFrom : Config msg -> Bool
+zoomControlFrom (Config { zoomControl }) =
     zoomControl
 
 
@@ -247,18 +246,18 @@ tagger (Config { toMsg }) =
 
 
 {-| -}
-interactions : Config msg -> Interactions
-interactions (Config { interactions }) =
+interactionsFrom : Config msg -> Interactions
+interactionsFrom (Config { interactions }) =
     interactions
 
 
 {-| -}
-attributionPrefix : Config msg -> Maybe String
-attributionPrefix (Config { attributionPrefix }) =
+attributionPrefixFrom : Config msg -> Maybe String
+attributionPrefixFrom (Config { attributionPrefix }) =
     attributionPrefix
 
 
 {-| -}
-pointerPositionDecoder : Config msg -> Decoder Point
-pointerPositionDecoder (Config { pointerPositionDecoder }) =
+pointerPositionDecoderFrom : Config msg -> Decoder Point
+pointerPositionDecoderFrom (Config { pointerPositionDecoder }) =
     pointerPositionDecoder

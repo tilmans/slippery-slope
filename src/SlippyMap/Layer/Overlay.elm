@@ -34,9 +34,9 @@ type Config overlay msg
 
 {-| -}
 config : (( Float, Float ) -> overlay -> Html msg) -> Config overlay msg
-config render =
+config render_ =
     Config
-        { renderOverlay = render }
+        { renderOverlay = render_ }
 
 
 {-| -}
@@ -63,18 +63,18 @@ imageOverlay ( width, height ) url =
 
 {-| -}
 layer : Config overlay msg -> List ( Location.Bounds, overlay ) -> Layer msg
-layer config boundedOverlays =
-    Layer.custom (render config boundedOverlays) Layer.overlay
+layer config_ boundedOverlays =
+    Layer.custom (render config_ boundedOverlays) Layer.overlay
 
 
 render : Config overlay msg -> List ( Location.Bounds, overlay ) -> Map msg -> Html msg
-render config boundedOverlays map =
+render config_ boundedOverlays map =
     Html.div []
-        (List.map (renderOverlay config map) boundedOverlays)
+        (List.map (renderOverlay config_ map) boundedOverlays)
 
 
 renderOverlay : Config overlay msg -> Map msg -> ( Location.Bounds, overlay ) -> Html msg
-renderOverlay (Config config) map ( bounds, overlay ) =
+renderOverlay (Config config_) map ( bounds, overlay ) =
     let
         origin =
             Map.origin map
@@ -96,14 +96,11 @@ renderOverlay (Config config) map ( bounds, overlay ) =
             Point.subtract origin southWestPoint
     in
     Html.div
-        [ Html.Attributes.style
-            [ ( "transform"
-              , "translate("
-                    ++ toString translate.x
+        [ Html.Attributes.style "transform" ("translate("
+                    ++ String.fromFloat translate.x
                     ++ "px, "
-                    ++ toString (translate.y - southWestPoint.y + northEastPoint.y)
+                    ++ String.fromFloat (translate.y - southWestPoint.y + northEastPoint.y)
                     ++ "px)"
               )
-            ]
         ]
-        [ config.renderOverlay overlaySize overlay ]
+        [ config_.renderOverlay overlaySize overlay ]

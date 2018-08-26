@@ -43,13 +43,13 @@ config urlTemplate subDomains =
 
 {-| -}
 layer : Config -> Layer msg
-layer config =
-    TileLayer.config identity (tile config)
+layer config_ =
+    TileLayer.config identity (tile config_)
         |> TileLayer.layer
 
 
 tile : Config -> Map msg -> Tile -> Svg msg
-tile (Config config) map ({ z } as tile) =
+tile (Config config_) map ({ z } as tile_) =
     let
         scale =
             Map.scaleZ map (toFloat z)
@@ -61,10 +61,10 @@ tile (Config config) map ({ z } as tile) =
         , Svg.Attributes.height
             -- (toString renderState.transform.tileSize)
             "256"
-        , Svg.Attributes.xlinkHref (config.toUrl tile)
+        , Svg.Attributes.xlinkHref (config_.toUrl tile_)
         , Svg.Attributes.transform
             ("scale("
-                ++ toString scale
+                ++ String.fromFloat scale
                 ++ ")"
             )
         ]

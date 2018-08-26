@@ -3,7 +3,7 @@ module SlippyMap.Map
         ( Map
         , bounds
         , center
-        , config
+        , configFrom
         , crs
         , locationBounds
         , locationToPoint
@@ -16,7 +16,7 @@ module SlippyMap.Map
         , scaleZ
         , screenPointToLocation
         , size
-        , state
+        , stateFrom
         , tileCover
         , zoom
         )
@@ -49,14 +49,14 @@ type Map msg
 make : Config msg -> State -> Map msg
 make config state =
     let
-        ( crs, size, scene ) =
-            ( Config.crs config
-            , Config.size config
+        ( crs_, size_, scene ) =
+            ( Config.crsFrom config
+            , Config.sizeFrom config
             , State.getScene state
             )
 
         transformer =
-            Transform.transformer crs size scene
+            Transform.transformer crs_ size_ scene
     in
     Map
         { config = config
@@ -68,37 +68,37 @@ make config state =
 {-| -}
 size : Map msg -> Point
 size =
-    config >> Config.size
+    configFrom >> Config.sizeFrom
 
 
 {-| -}
 crs : Map msg -> CRS
 crs =
-    config >> Config.crs
+    configFrom >> Config.crsFrom
 
 
 {-| -}
-config : Map msg -> Config msg
-config (Map { config }) =
+configFrom : Map msg -> Config msg
+configFrom (Map { config }) =
     config
 
 
 {-| -}
-state : Map msg -> State
-state (Map { state }) =
+stateFrom : Map msg -> State
+stateFrom (Map { state }) =
     state
 
 
 {-| -}
 center : Map msg -> Location
 center =
-    state >> State.getScene >> .center
+    stateFrom >> State.getScene >> .center
 
 
 {-| -}
 zoom : Map msg -> Float
 zoom =
-    state >> State.getScene >> .zoom
+    stateFrom >> State.getScene >> .zoom
 
 
 {-| -}

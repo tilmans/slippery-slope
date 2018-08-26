@@ -10,7 +10,6 @@ import Html exposing (Html)
 import Html.Attributes
 import Html.Events
 import Json.Decode as Decode exposing (Decoder)
-import Mouse exposing (Position)
 import SlippyMap.Config as Config exposing (Config(..))
 import SlippyMap.Control.Attribution as Attribution
 import SlippyMap.Control.Zoom as Zoom

@@ -42,8 +42,8 @@ config toData renderData =
 
 {-| -}
 layer : Config data msg -> Layer msg
-layer config =
-    Layer.custom (render config) Layer.base
+layer config_ =
+    Layer.custom (render config_) Layer.base
 
 
 render : Config data msg -> Map msg -> Svg msg
@@ -67,22 +67,22 @@ render (Config { toData, renderData }) map =
         [ -- Important for touch pinching
           Svg.Attributes.pointerEvents "none"
         , Svg.Attributes.width
-            (toString size.x)
+            (String.fromFloat size.x)
         , Svg.Attributes.height
-            (toString size.y)
+            (String.fromFloat size.y)
         ]
         tilesRendered
 
 
 tile : (Tile -> Svg msg) -> Map msg -> Tile -> ( String, Svg msg )
-tile render map ({ z, x, y } as tile) =
+tile render_ map ({ z, x, y } as tile_) =
     let
         key =
-            toString z
+            String.fromInt z
                 ++ "/"
-                ++ toString (x % (2 ^ z))
+                ++ String.fromInt (modBy x (2 ^ z))
                 ++ "/"
-                ++ toString (y % (2 ^ z))
+                ++ String.fromInt (modBy y (2 ^ z))
 
         scale =
             Map.scaleT map (toFloat z)
@@ -102,13 +102,13 @@ tile render map ({ z, x, y } as tile) =
         [ Svg.Attributes.class "tile"
         , Svg.Attributes.transform
             ("translate("
-                ++ toString point.x
+                ++ String.fromFloat point.x
                 ++ " "
-                ++ toString point.y
+                ++ String.fromFloat point.y
                 ++ ")"
             )
         ]
-        [ render tile ]
+        [ render_ tile_ ]
     )
 
 
@@ -116,21 +116,29 @@ tile render map ({ z, x, y } as tile) =
 -}
 toUrl : String -> List String -> Tile -> String
 toUrl urlTemplate subDomains { z, x, y } =
+    let
+        -- Fancy rotation logic?
+        subdomainChoice = modBy (abs (x+y)) (max 1 <| List.length subDomains)
+        subDomain = List.drop subdomainChoice subDomains
+            |>List.head
+            |> Maybe.withDefault ""
+    in
+
     urlTemplate
-        |> replace "{z}" (toString (max 0 z))
-        |> replace "{x}" (toString (x % (2 ^ z)))
-        |> replace "{y}" (toString (y % (2 ^ z)))
-        |> replace "{s}"
-            ((abs (x + y) % (max 1 <| List.length subDomains))
-                |> flip List.drop subDomains
-                |> List.head
-                |> Maybe.withDefault ""
-            )
+        |> replace "{z}" (String.fromInt (max 0 z))
+        |> replace "{x}" (String.fromInt (modBy x (2 ^ z)))
+        |> replace "{y}" (String.fromInt (modBy y (2 ^ z)))
+        |> replace "{s}" subDomain
 
 
 replace : String -> String -> String -> String
 replace search substitution string =
+    let
+        regex = Regex.fromString search  -- TODO: No longer has escape ... issue?
+            |> Maybe.withDefault Regex.never
+    in
+
     string
-        |> Regex.replace Regex.All
-            (Regex.regex (Regex.escape search))
+        |> Regex.replace
+            regex
             (\_ -> substitution)

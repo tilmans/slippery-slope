@@ -11,12 +11,9 @@ module SlippyMap.Msg
 
 -}
 
-import Keyboard exposing (KeyCode)
-import Mouse exposing (Position)
 import SlippyMap.Geo.Point exposing (Point)
-import SlippyMap.Types exposing (Focus)
-import Time exposing (Time)
-
+import SlippyMap.Types exposing (Focus, Position)
+import Time exposing (Posix)
 
 {-| -}
 type Msg
@@ -27,8 +24,8 @@ type Msg
     | DragMsg DragMsg
     | PinchMsg PinchMsg
     | SetFocus Focus
-    | KeyboardNavigation KeyCode
-    | Tick Time
+    | KeyboardNavigation String -- TODO: This will need a type
+    | Tick Float
 
 
 {-| -}

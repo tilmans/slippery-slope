@@ -47,8 +47,8 @@ coordinateToTile { column, row, zoom } =
 normalize : Tile -> Tile
 normalize { z, x, y } =
     { z = z
-    , x = x % (2 ^ z)
-    , y = y % (2 ^ z)
+    , x = modBy x (2 ^ z)
+    , y = modBy y (2 ^ z)
     }
 
 

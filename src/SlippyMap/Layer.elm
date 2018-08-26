@@ -69,8 +69,8 @@ paneToLevel pane =
         ControlPane ->
             40
 
-        CustomLevel level ->
-            level
+        CustomLevel level_ ->
+            level_
 
 
 {-| Create the `Config` for a `Layer` rendered on the base `Pane`.
@@ -153,11 +153,11 @@ type Layer msg
 {-| TODO: rename
 -}
 custom : (Map msg -> Html msg) -> Config msg -> Layer msg
-custom render (Config config) =
+custom render_ (Config config) =
     Layer Nothing <|
         Config
             { config
-                | renderer = Renderer render
+                | renderer = Renderer render_
             }
 
 

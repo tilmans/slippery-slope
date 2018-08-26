@@ -3,7 +3,7 @@ module SlippyMap.Layer.RemoteTile
         ( Config
         , config
         , layer
-        , toUrl
+        , toUrlFrom
         , withRender
         , withTile
         )
@@ -43,7 +43,7 @@ config : String -> List String -> Config data msg
 config urlTemplate subDomains =
     Config
         { toUrl = TileLayer.toUrl urlTemplate subDomains
-        , fromTile = \tile -> ( tile, RemoteData.NotAsked )
+        , fromTile = \tile_ -> ( tile_, RemoteData.NotAsked )
         , render = \_ _ -> Svg.text ""
         }
 
@@ -63,8 +63,8 @@ withRender render (Config configInternal) =
 
 
 {-| -}
-toUrl : Config data msg -> Tile -> String
-toUrl (Config { toUrl }) =
+toUrlFrom : Config data msg -> Tile -> String
+toUrlFrom (Config { toUrl }) =
     toUrl
 
 
@@ -74,14 +74,14 @@ toUrl (Config { toUrl }) =
 
 {-| -}
 layer : Config data msg -> Layer msg
-layer ((Config configInternal) as config) =
+layer ((Config configInternal) as config_) =
     TileLayer.config configInternal.fromTile
-        (tile config)
+        (tile config_)
         |> TileLayer.layer
 
 
 tile : Config data msg -> Map msg -> ( Tile, WebData data ) -> Svg msg
-tile (Config configInternal) map ( tile, tileResponse ) =
+tile (Config configInternal) map ( tile_, tileResponse ) =
     case tileResponse of
         RemoteData.NotAsked ->
             Svg.text_ [] [ Svg.text "Not Asked" ]
@@ -90,7 +90,7 @@ tile (Config configInternal) map ( tile, tileResponse ) =
             Svg.text_ [] [ Svg.text "Loading" ]
 
         RemoteData.Failure e ->
-            Svg.text_ [] [ Svg.text ("Error: " ++ toString e) ]
+            Svg.text_ [] [ Svg.text ("Error Loading Remote Data") ] -- TODO: Add better handling
 
         RemoteData.Success value ->
-            configInternal.render ( tile, value ) map
+            configInternal.render ( tile_, value ) map

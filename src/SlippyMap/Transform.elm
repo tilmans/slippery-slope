@@ -10,9 +10,9 @@ module SlippyMap.Transform
         , scaleZ
         , screenPointToLocation
         , tileCover
-        , transform
+        , transformWith
         , transformer
-        , zoom
+        , zoomWith
         )
 
 {-|
@@ -39,8 +39,8 @@ type Transform
 
 
 {-| -}
-transform : CRS -> Point -> Scene -> Transform
-transform crs size { center, zoom } =
+transformWith : CRS -> Point -> Scene -> Transform
+transformWith crs size { center, zoom } =
     Transform
         { size = size
         , crs = crs
@@ -70,7 +70,7 @@ transformer : CRS -> Point -> Scene -> Transformer
 transformer crs size scene =
     let
         t =
-            transform crs size scene
+            transformWith crs size scene
     in
     { origin = origin t
     , bounds = bounds t
@@ -86,24 +86,24 @@ transformer crs size scene =
     }
 
 
-size : Transform -> Point
-size (Transform transform) =
+sizeWith : Transform -> Point
+sizeWith (Transform transform) =
     transform.size
 
 
-crs : Transform -> CRS
-crs (Transform transform) =
+crsWith : Transform -> CRS
+crsWith (Transform transform) =
     transform.crs
 
 
-center : Transform -> Location
-center (Transform transform) =
+centerWith : Transform -> Location
+centerWith (Transform transform) =
     transform.center
 
 
 {-| -}
-zoom : Transform -> Float
-zoom (Transform transform) =
+zoomWith : Transform -> Float
+zoomWith (Transform transform) =
     transform.zoom
 
 
@@ -111,8 +111,8 @@ zoom (Transform transform) =
 origin : Transform -> Point
 origin transform =
     Point.subtract
-        (Point.divideBy 2 <| size transform)
-        (locationToPoint transform <| center transform)
+        (Point.divideBy 2 <| sizeWith transform)
+        (locationToPoint transform <| centerWith transform)
 
 
 {-| -}
@@ -123,7 +123,7 @@ bounds transform =
             origin transform
     in
     { topLeft = topLeft
-    , bottomRight = Point.add (size transform) topLeft
+    , bottomRight = Point.add (sizeWith transform) topLeft
     }
 
 
@@ -149,15 +149,15 @@ locationBounds transform =
 {-| -}
 scaleT : Transform -> Float -> Float
 scaleT transform z =
-    .scale (crs transform)
-        (zoom transform - z)
+    .scale (crsWith transform)
+        (zoomWith transform - z)
 
 
 {-| -}
 scaleZ : Transform -> Float -> Float
 scaleZ transform z =
-    .scale (crs transform) (zoom transform)
-        / .scale (crs transform) z
+    .scale (crsWith transform) (zoomWith transform)
+        / .scale (crsWith transform) z
 
 
 {-| -}
@@ -191,8 +191,8 @@ pointToLocation (Transform transform) point =
 {-| -}
 screenPointToLocation : Transform -> Point -> Location
 screenPointToLocation transform point =
-    .pointToLocation (crs transform)
-        (zoom transform)
+    .pointToLocation (crsWith transform)
+        (zoomWith transform)
         (Point.add (origin transform) point)
 
 
@@ -208,14 +208,14 @@ tileCover transform =
         |> List.filter
             (\{ z } ->
                 (z == 0)
-                    || (z == floor (zoom transform))
-                    || (z == floor (zoom transform - 1))
+                    || (z == floor (zoomWith transform))
+                    || (z == floor (zoomWith transform - 1))
             )
 
 
 tileCoverHelp : Transform -> Tile -> List Tile
 tileCoverHelp transform parentTile =
-    if zoom transform <= toFloat parentTile.z then
+    if zoomWith transform <= toFloat parentTile.z then
         []
     else
         let
@@ -238,8 +238,8 @@ isVisible : Transform -> Tile -> Bool
 isVisible transform tile =
     let
         scale =
-            .scale (crs transform)
-                (zoom transform - toFloat tile.z)
+            .scale (crsWith transform)
+                (zoomWith transform - toFloat tile.z)
 
         toLocation ( x, y ) =
             { x = toFloat x

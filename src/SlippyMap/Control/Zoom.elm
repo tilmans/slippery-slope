@@ -14,7 +14,7 @@ import SlippyMap.Config as Map
 import SlippyMap.Layer exposing (Layer)
 import SlippyMap.Layer.Control as Control
 import SlippyMap.Map as Map exposing (Map)
-import SlippyMap.Msg exposing (Msg(ZoomIn, ZoomOut))
+import SlippyMap.Msg exposing (Msg(..))
 import SlippyMap.State as Map
 import Svg
 import Svg.Attributes

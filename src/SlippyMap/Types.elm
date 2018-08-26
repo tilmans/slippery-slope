@@ -7,6 +7,7 @@ module SlippyMap.Types
         , Scene
         , Size
         , Transition(..)
+        , Position
         )
 
 {-|
@@ -15,10 +16,13 @@ module SlippyMap.Types
 
 -}
 
-import Mouse exposing (Position)
 import SlippyMap.Geo.Location exposing (Location)
-import Time exposing (Time)
+import Time exposing (Posix)
 
+type alias Position =
+    { x: Int
+    , y: Int
+    }
 
 {-| -}
 type alias Size =
@@ -41,14 +45,14 @@ type Transition
     | MoveTo
         { fromScene : Scene
         , toScene : Scene
-        , duration : Time
-        , elapsed : Time
+        , duration : Float
+        , elapsed : Float
         }
     | FlyTo
         { fromScene : Scene
         , toScene : Scene
-        , duration : Time
-        , elapsed : Time
+        , duration : Float
+        , elapsed : Float
         }
 
 

@@ -3,7 +3,7 @@ module SlippyMap.Layer.RemoteImage
         ( Config
         , config
         , layer
-        , toUrl
+        , toUrlFrom
         , withTile
         )
 
@@ -51,8 +51,8 @@ withTile fromTile (Config configInternal) =
 
 
 {-| -}
-toUrl : Config -> Tile -> String
-toUrl (Config { toUrl }) =
+toUrlFrom : Config -> Tile -> String
+toUrlFrom (Config { toUrl }) =
     toUrl
 
 
@@ -62,9 +62,9 @@ toUrl (Config { toUrl }) =
 
 {-| -}
 layer : Config -> Layer msg
-layer ((Config configInternal) as config) =
+layer ((Config configInternal) as config_) =
     TileLayer.config configInternal.fromTile
-        (tile config)
+        (tile config_)
         |> TileLayer.layer
 
 
@@ -82,7 +82,7 @@ tile (Config configInternal) map tileResponse =
             Svg.text_ [] [ Svg.text "Loading" ]
 
         RemoteData.Failure e ->
-            Svg.text_ [] [ Svg.text ("Error: " ++ toString e) ]
+            Svg.text_ [] [ Svg.text ("Error: Can't load remote image") ] -- TODO:Better to string
 
         RemoteData.Success t ->
             Svg.image
@@ -95,7 +95,7 @@ tile (Config configInternal) map tileResponse =
                 , Svg.Attributes.xlinkHref (configInternal.toUrl t)
                 , Svg.Attributes.transform
                     ("scale("
-                        ++ toString scale
+                        ++ String.fromFloat scale
                         ++ ")"
                     )
                 ]

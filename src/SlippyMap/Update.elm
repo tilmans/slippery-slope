@@ -6,7 +6,6 @@ module SlippyMap.Update exposing (Msg, update)
 
 -}
 
-import Keyboard exposing (KeyCode)
 import SlippyMap.Config exposing (Config(..))
 import SlippyMap.Geo.Point exposing (Point)
 import SlippyMap.Map as Map exposing (Map)
@@ -71,55 +70,57 @@ type KeyboardNavigation
     | NoKeyboardNavigation
 
 
-keyboardNavigation : KeyCode -> KeyboardNavigation
+keyboardNavigation : String -> KeyboardNavigation
 keyboardNavigation keyCode =
-    let
-        distance =
-            50
-    in
-    case keyCode of
-        -- Left
-        37 ->
-            KeyboardMoveBy { x = -distance, y = 0 }
-
-        -- Up
-        38 ->
-            KeyboardMoveBy { x = 0, y = -distance }
-
-        -- Right
-        39 ->
-            KeyboardMoveBy { x = distance, y = 0 }
-
-        -- Down
-        40 ->
-            KeyboardMoveBy { x = 0, y = distance }
-
-        187 ->
-            KeyboardZoomIn
-
-        107 ->
-            KeyboardZoomIn
-
-        61 ->
-            KeyboardZoomIn
-
-        171 ->
-            KeyboardZoomIn
-
-        189 ->
-            KeyboardZoomOut
-
-        109 ->
-            KeyboardZoomOut
-
-        54 ->
-            KeyboardZoomOut
-
-        173 ->
-            KeyboardZoomOut
-
-        _ ->
-            NoKeyboardNavigation
+    -- TODO: Port this
+    NoKeyboardNavigation
+    -- let
+    --     distance =
+    --         50
+    -- in
+    -- case keyCode of
+    --     -- Left
+    --     37 ->
+    --         KeyboardMoveBy { x = -distance, y = 0 }
+    --
+    --     -- Up
+    --     38 ->
+    --         KeyboardMoveBy { x = 0, y = -distance }
+    --
+    --     -- Right
+    --     39 ->
+    --         KeyboardMoveBy { x = distance, y = 0 }
+    --
+    --     -- Down
+    --     40 ->
+    --         KeyboardMoveBy { x = 0, y = distance }
+    --
+    --     187 ->
+    --         KeyboardZoomIn
+    --
+    --     107 ->
+    --         KeyboardZoomIn
+    --
+    --     61 ->
+    --         KeyboardZoomIn
+    --
+    --     171 ->
+    --         KeyboardZoomIn
+    --
+    --     189 ->
+    --         KeyboardZoomOut
+    --
+    --     109 ->
+    --         KeyboardZoomOut
+    --
+    --     54 ->
+    --         KeyboardZoomOut
+    --
+    --     173 ->
+    --         KeyboardZoomOut
+    --
+    --     _ ->
+    --         NoKeyboardNavigation
 
 
 updateKeyboardNavigation : Config msg -> KeyboardNavigation -> State -> State
@@ -142,7 +143,7 @@ updateDrag : Config msg -> DragMsg -> State -> State
 updateDrag config dragMsg state =
     let
         interaction =
-            State.interaction state
+            State.interactionFrom state
     in
     State.withInteraction config <|
         case dragMsg of
@@ -203,7 +204,7 @@ updatePinch : Config msg -> PinchMsg -> State -> State
 updatePinch config pinchMsg state =
     let
         interaction =
-            State.interaction state
+            State.interactionFrom state
     in
     case pinchMsg of
         PinchStart touches ->

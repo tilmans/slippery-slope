@@ -20,8 +20,8 @@ crs =
     , pointToLocation = pointToLocation
     , project = project
     , unproject = unproject
-    , scale = scale
-    , zoom = zoom
+    , scale = scaleWith
+    , zoom = zoomWith
     , distance = distance
     , code = code
     }
@@ -56,7 +56,7 @@ locationToPoint atZoom location =
     location
         |> project
         |> Transformation.transform transformation
-        |> Point.multiplyBy (scale atZoom)
+        |> Point.multiplyBy (scaleWith atZoom)
 
 
 {-|
@@ -69,7 +69,7 @@ locationToPoint atZoom location =
 pointToLocation : Float -> Point -> Location
 pointToLocation atZoom point =
     point
-        |> Point.divideBy (scale atZoom)
+        |> Point.divideBy (scaleWith atZoom)
         |> Transformation.untransform transformation
         |> unproject
 
@@ -91,13 +91,13 @@ unproject =
     Projection.unproject
 
 
-scale : Float -> Float
-scale zoom =
+scaleWith : Float -> Float
+scaleWith zoom =
     256 * 2 ^ zoom
 
 
-zoom : Float -> Float
-zoom scale =
+zoomWith : Float -> Float
+zoomWith scale =
     logBase e (scale / 256) / logBase e 2
 
 
